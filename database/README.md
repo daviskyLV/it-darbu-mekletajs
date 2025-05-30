@@ -1,5 +1,8 @@
 # Database DDL, Stored Functions and Stored Procedures
-For the scripts to work, the database tables and functions/procedures must be set up. The scripts shouldn't have access to modify/read table data directly and should only use these functions/procedures:
+For the scripts to work, the database tables and functions/procedures must be set up. Additionally, it is important to understand how the `vacancies` table `summarized_description` column JSONB is formatted. An example formation can be found in `summarized_description.json`.
+
+## Scraper interface
+The scripts shouldn't have access to modify/read table data directly and should only use these functions/procedures:
 1. `work_scraper.website_is_stale` - This **function** should be used to check whether the website domain vacancy list needs to be refetched.
 2. `work_scraper.mark_website_scanning` - this **procedure** should be used when the scraper decides to rescan the whole list.
 3. `work_scraper.add_vacancies` - this **procedure** should be used when the scraper has refetched the vacancy list and wants to add vacancy information to the table.
