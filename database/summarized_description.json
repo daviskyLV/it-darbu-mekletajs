@@ -1,8 +1,9 @@
 {
-    "languages": ["Latvian", "English", "..."],
+    "languages": ["lv", "en", "..."],
     "frameworks": ["Angular", "Laravel", "..."],
     "year_exp": 2.0,
     "technologies": ["Docker", "AWS", "Kubernetes", "..."],
     "business_software": ["Atlassian", "Power BI", "..."],
-    "programming_languages": ["C", "C#", "..."]
+    "programming_languages": ["C", "C#", "..."],
+    "general_keywords": ["DevOps", "Testing", "..."]
 }
