@@ -8,8 +8,9 @@ BEGIN
     -- inserting missing cities
     -- filtering out null values
     WITH filter_nulls AS (
-        SELECT unnest(cities) AS city_name
-        WHERE city_name IS NOT NULL
+        SELECT c.city_name
+        FROM unnest(cities) AS c(city_name)
+        WHERE c.city_name IS NOT NULL
     )
     -- inserting non null cities
     INSERT INTO work_scraper.cities (city_name)

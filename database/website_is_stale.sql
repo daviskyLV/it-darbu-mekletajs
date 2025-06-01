@@ -17,13 +17,13 @@ BEGIN
     IF last_updated IS NULL OR currently_scanning IS NULL THEN
         -- source not found
         stale := FALSE;
-    ELSE IF currently_scanning IS FALSE AND now() >= last_updated + INTERVAL '3 days' THEN
+    ELSIF currently_scanning = FALSE AND now() >= last_updated + INTERVAL '3 days' THEN
         -- website isnt currently getting scanned and its been 3 days since last scan
         stale := TRUE;
-    ELSE IF currently_scanning IS TRUE AND now() >= last_updated + INTERVAL '2 hours' THEN
+    ELSIF currently_scanning = TRUE AND now() >= last_updated + INTERVAL '2 hours' THEN
         -- website is currently marked as scanned, but hasnt received any updates in a while
         -- marking as stale
-        stale := TRUE
+        stale := TRUE;
     END IF;
 
     RETURN stale;

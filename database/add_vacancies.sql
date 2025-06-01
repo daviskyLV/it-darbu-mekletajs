@@ -1,7 +1,7 @@
 -- used to add several brand new vacancies
 CREATE OR REPLACE PROCEDURE work_scraper.add_vacancies(
     title TEXT[], employer TEXT[],
-    salary_min DOUBLE[], salary_max DOUBLE[],
+    salary_min DOUBLE PRECISION[], salary_max DOUBLE PRECISION[],
     is_hourly BOOLEAN[], remote BOOLEAN[],
     published TIMESTAMP[], expires TIMESTAMP[],
     country_code VARCHAR(8)[], city_name TEXT[],

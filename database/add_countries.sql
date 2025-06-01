@@ -8,8 +8,9 @@ BEGIN
     -- inserting missing countries
     -- filtering out null values
     WITH filter_nulls AS (
-        SELECT unnest(country_codes) AS cc
-        WHERE cc IS NOT NULL
+        SELECT c.cc
+        FROM unnest(country_codes) AS c(cc)
+        WHERE c.cc IS NOT NULL
     )
     -- inserting non null countries
     INSERT INTO work_scraper.countries (country_code)

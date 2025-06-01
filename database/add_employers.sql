@@ -8,8 +8,9 @@ BEGIN
     -- inserting missing employers
     -- filtering out null values
     WITH filter_nulls AS (
-        SELECT unnest(employers) AS title
-        WHERE title IS NOT NULL
+        SELECT e.title
+        FROM unnest(employers) AS e(title)
+        WHERE e.title IS NOT NULL
     )
     -- inserting non null employers
     INSERT INTO work_scraper.employers (title)
