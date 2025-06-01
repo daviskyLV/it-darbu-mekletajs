@@ -27,6 +27,31 @@
         "Fortran": ["fortran"],
         "Groovy": ["groovy"]
     },
+    "frameworks": {
+        "ReactJS": ["react"],
+        "jQuery": ["jquery"],
+        "Next.js": ["next.", "nextj"],
+        "Express": ["express"],
+        "Angular": ["angular"],
+        "ASP.NET": ["asp.net"],
+        "Vue": ["vue"],
+        "Spring Boot": ["spring"],
+        "WordPress": ["wordpress"],
+        "Django": ["django"],
+        "Laravel": ["laravel"],
+        "Svelte": ["svelte"],
+        "NestJS": ["nestjs"],
+        "Blazor": ["blazor"],
+        "Nuxt": ["nuxt"],
+        "Htmx": ["htmx"],
+        "Magento": ["magento"],
+        "Gatsby": ["gatsby"],
+        "Tailwind": ["tailwind"],
+        "Bootstrap": ["bootstrap"],
+        "Ruby on Rails": ["ruby on rails", "ror"],
+        "Xamarin": ["xamarin"],
+        "Flutter": ["flutter"]
+    },
     "technologies": {
         "Git": ["git"],
         "Linux": ["linux"],
@@ -38,19 +63,25 @@
         "GCP": ["gcp", "google"],
         "Azure": ["azur"],
         "DigitalOcean": ["digitalocean"],
-        "Cloudflare": ["cloudflare"]
+        "Cloudflare": ["cloudflare"],
+        "Deno": ["deno"],
+        "NodeJS": ["node"],
+        "Tensorflow": ["tensorflow"],
+        "Web API": ["soap", "rest", "api"]
     },
     "businessSoftware": {
-        "Atlassian": ["atlassian", "jira", "confluence"]
+        "Atlassian": ["atlassian", "jira", "confluence"],
+        "Power BI": ["power bi"]
     },
     "general": {
-        "DevOps": ["devops"],
+        "DevOps": ["devops, microserv"],
         "Front-End Dev": ["front-end", "front end", "frontend"],
         "Full-Stack Dev": ["full-stack", "full stack", "fullstack"],
         "Back-End Dev": ["back-end", "back end", "backend"],
         "Databases": ["datubāz", "databas"],
         "Automation": ["automat", "ci/cd", "workflow"],
         "Developer": ["software", "izstrādātā", "develop", "program"],
+        "IT": [" it "],
         "Networks": ["network", "datortīkl"],
         "Testing": ["qa ", "test"]
     }
