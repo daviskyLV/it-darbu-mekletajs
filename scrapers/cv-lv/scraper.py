@@ -144,13 +144,15 @@ if __name__ == "__main__":
     dotenv_rel = ".env"
 
     # Load environment variables from .env file
-    dotenv_abs = os.path.join(script_dir, dotenv_rel)
+    dotenv_abs = os.path.abspath(os.path.join(script_dir, dotenv_rel))
     load_dotenv(dotenv_abs)
     connection = db.get_connection()
 
     # Reading keywords.json
     keywords_json: dict[str, dict[str, list[str]]] = {}
-    with open(os.getenv(os.path.join(script_dir, keywords_rel), ""), "r") as file:
+    with open(
+        os.getenv(os.path.abspath(os.path.join(script_dir, keywords_rel)), ""),
+        "r") as file:
         keywords_json: dict[str, dict[str, list[str]]] = json.load(file)
 
     # main loop
