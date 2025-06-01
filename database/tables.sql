@@ -44,8 +44,7 @@ CREATE TABLE work_scraper.countries
 (
     id              SERIAL
                     CONSTRAINT countries_pk PRIMARY KEY,
-    country_code    VARCHAR(8) NOT NULL,
-    title           TEXT NOT NULL
+    country_code    VARCHAR(8) NOT NULL
 );
 
 CREATE UNIQUE INDEX country_code_index

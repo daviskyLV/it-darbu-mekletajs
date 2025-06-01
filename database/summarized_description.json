@@ -1,8 +1,8 @@
 {
     "languages": ["Latvian", "English", "..."],
     "frameworks": ["Angular", "Laravel", "..."],
-    "yr_exp": 2,
+    "year_exp": 2.0,
     "technologies": ["Docker", "AWS", "Kubernetes", "..."],
     "business_software": ["Atlassian", "Power BI", "..."],
-    "prog_languages": ["C", "C#", "..."]
+    "programming_languages": ["C", "C#", "..."]
 }

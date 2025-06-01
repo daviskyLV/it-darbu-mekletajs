@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE work_scraper.add_vacancies(
     salary_min DOUBLE[], salary_max DOUBLE[],
     is_hourly BOOLEAN[], remote BOOLEAN[],
     published TIMESTAMP[], expires TIMESTAMP[],
-    country_code VARCHAR(8)[], country_name TEXT[], city_name TEXT[],
+    country_code VARCHAR(8)[], city_name TEXT[],
     full_info BOOLEAN[], web_id TEXT[], source TEXT,
     description TEXT[], summarized JSONB[]
 )
@@ -20,7 +20,7 @@ DECLARE
 BEGIN
     SELECT get_website_id(source) INTO source_id;
     CALL work_scraper.add_employers(employer, emp_ids);
-    CALL work_scraper.add_countries(country_code, country_name, country_ids);
+    CALL work_scraper.add_countries(country_code, country_ids);
     CALL work_scraper.add_cities(city_name, city_ids);
     -- converting full_info to either epoch time (needs rechecking) or now()
     SELECT ARRAY(

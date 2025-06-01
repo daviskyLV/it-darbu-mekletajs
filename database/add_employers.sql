@@ -8,7 +8,7 @@ BEGIN
     -- inserting missing employers
     -- filtering out null values
     WITH filter_nulls AS (
-        SELECT unnest(employer) AS title
+        SELECT unnest(employers) AS title
         WHERE title IS NOT NULL
     )
     -- inserting non null employers

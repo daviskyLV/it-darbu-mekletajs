@@ -1,5 +1,8 @@
--- returns 20 vacancy web ids that are stale for the given source
-CREATE OR REPLACE PROCEDURE work_scraper.get_stale_vacancies(source TEXT, OUT vacancy_ids TEXT[])
+-- returns up to 20 vacancy web ids and row ids that are stale for the given source
+CREATE OR REPLACE FUNCTION work_scraper.get_stale_vacancies(
+    source TEXT
+)
+RETURNS TABLE(vacancy_web_id TEXT, db_id INTEGER)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -10,23 +13,30 @@ BEGIN
 
     -- handling invalid source input
     IF NOT FOUND THEN
-        vacancy_ids := ARRAY[]::TEXT[];
         RETURN;
     END IF;
 
-    -- getting vacancies to update
+    RETURN QUERY
     WITH to_update AS (
-        SELECT vacancy_web_id
+        -- getting vacancies to update
+        SELECT vacancy_web_id, id
         FROM work_scraper.vacancies
-        WHERE curtime >= last_checked + INTERVAL '5 days' AND web_source = source_id
+        WHERE curtime >= last_checked + INTERVAL '5 days'
+            AND web_source = source_id
+            -- ignoring vacancies that are expired more than a day ago
+            AND (expires IS NULL OR curtime <= expires + INTERVAL '24 hours')
         LIMIT 20
         FOR UPDATE SKIP LOCKED -- locking for update
+    ),
+    updated AS (
+        -- reserving their time
+        UPDATE work_scraper.vacancies v
+        SET last_checked = curtime - INTERVAL '4 days 22 hours' -- reserving for 2 hours
+        FROM to_update tu
+        WHERE v.id = tu.id
     )
-    -- updating them
-    UPDATE work_scraper.vacancies
-    SET last_checked = curtime - INTERVAL '4 days 22 hours' -- reserving for 2 hours
-    WHERE web_source = source_id AND vacancy_web_id IN (SELECT vacancy_web_id FROM to_update)
-    -- returning back vacancy ids to caller
-    RETURNING vacancy_web_id INTO vacancy_ids;
+    -- returning vacancy web ids and database ids
+    SELECT vacancy_web_id, id AS db_id
+    FROM to_update;
 END;
 $$;

@@ -6,7 +6,7 @@ The scripts shouldn't have access to modify/read table data directly and should 
 1. `work_scraper.website_is_stale` - This **function** should be used to check whether the website domain vacancy list needs to be refetched.
 2. `work_scraper.mark_website_scanning` - this **procedure** should be used when the scraper decides to rescan the whole list.
 3. `work_scraper.add_vacancies` - this **procedure** should be used when the scraper has refetched the vacancy list and wants to add vacancy information to the table.
-4. `work_scraper.get_stale_vacancies` - this **procedure** should be used when the scraper wants to get out of date vacancies. The procedure reserves these vacancies for the scraper for 2 hours.
+4. `work_scraper.get_stale_vacancies` - this **function** should be used when the scraper wants to get out of date vacancies. The procedure reserves these vacancies for the scraper for 2 hours.
 5. `work_scraper.update_vacancies` - this **procedure** should be used when the scraper wants to update an already EXISTING vacancy.
 
 ## Installation

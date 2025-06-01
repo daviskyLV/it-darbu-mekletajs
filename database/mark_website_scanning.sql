@@ -5,6 +5,6 @@ AS $$
 BEGIN
     UPDATE work_scraper.sources
     SET scanning = scanning_status, status_updated = now()
-    WHERE website = source
+    WHERE website = source;
 END;
 $$;
