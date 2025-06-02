@@ -22,10 +22,10 @@ BEGIN
     -- converting full_info to either epoch time (needs rechecking) or now()
     SELECT ARRAY(
         SELECT CASE WHEN
-            input.fi IS NULL OR input.fi = 0 THEN timestamp 'epoch'
+            inp.fi IS NULL OR inp.fi = FALSE THEN timestamp 'epoch'
             ELSE curtime
         END
-        FROM unnest(full_info) WITH ORDINALITY AS input(fi, ord) -- to keep correct order
+        FROM unnest(full_info) WITH ORDINALITY AS inp(fi, ord) -- to keep correct order
         ORDER BY ord
     )
     INTO checked_times;
@@ -51,6 +51,7 @@ BEGIN
         -- converting parameters and variables into an array
         SELECT
             vacancy_id[i] AS id,
+            title[i] AS title,
             emp_ids[i] AS employer,
             salary_min[i] AS salary_min,
             salary_max[i] AS salary_max,

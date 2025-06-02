@@ -18,17 +18,17 @@ DECLARE
     city_ids INTEGER[];
     source_id INTEGER;
 BEGIN
-    SELECT get_website_id(source) INTO source_id;
+    SELECT work_scraper.get_website_id(source) INTO source_id;
     CALL work_scraper.add_employers(employer, emp_ids);
     CALL work_scraper.add_countries(country_code, country_ids);
     CALL work_scraper.add_cities(city_name, city_ids);
     -- converting full_info to either epoch time (needs rechecking) or now()
     SELECT ARRAY(
         SELECT CASE
-            WHEN input.fi IS NULL OR input.fi = 0 THEN timestamp 'epoch'
+            WHEN inp.fi IS NULL OR inp.fi = FALSE THEN timestamp 'epoch'
             ELSE curtime
         END
-        FROM unnest(full_info) WITH ORDINALITY AS input(fi, ord) -- to keep correct order
+        FROM unnest(full_info) WITH ORDINALITY AS inp(fi, ord) -- to keep correct order
         ORDER BY ord
     )
     INTO checked_times;

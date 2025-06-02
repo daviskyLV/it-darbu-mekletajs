@@ -9,7 +9,7 @@ DECLARE
     curtime TIMESTAMP := now();
     source_id INTEGER;
 BEGIN
-    SELECT get_website_id(source) INTO source_id;
+    SELECT work_scraper.get_website_id(source) INTO source_id;
 
     -- handling invalid source input
     IF NOT FOUND THEN
@@ -19,12 +19,12 @@ BEGIN
     RETURN QUERY
     WITH to_update AS (
         -- getting vacancies to update
-        SELECT vacancy_web_id, id
-        FROM work_scraper.vacancies
-        WHERE curtime >= last_checked + INTERVAL '5 days'
-            AND web_source = source_id
+        SELECT v.vacancy_web_id, v.id
+        FROM work_scraper.vacancies v
+        WHERE curtime >= v.last_checked + INTERVAL '5 days'
+            AND v.web_source = source_id
             -- ignoring vacancies that are expired more than a day ago
-            AND (expires IS NULL OR curtime <= expires + INTERVAL '24 hours')
+            AND (v.expires IS NULL OR curtime <= v.expires + INTERVAL '24 hours')
         LIMIT 20
         FOR UPDATE SKIP LOCKED -- locking for update
     ),
@@ -36,7 +36,7 @@ BEGIN
         WHERE v.id = tu.id
     )
     -- returning vacancy web ids and database ids
-    SELECT vacancy_web_id, id AS db_id
-    FROM to_update;
+    SELECT tu.vacancy_web_id, tu.id
+    FROM to_update tu;
 END;
 $$;
