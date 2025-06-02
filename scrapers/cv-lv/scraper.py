@@ -178,6 +178,7 @@ if __name__ == "__main__":
 
     # main loop
     while True:
+        time.sleep(REQUEST_DELAY) # delay between requests
         # updating website vacancy list if its outdated
         website_stale = db.check_if_website_stale(connection, DOMAIN)
         if website_stale:
@@ -216,6 +217,9 @@ if __name__ == "__main__":
 
         # Fetching full info for stale vacancies
         stale_vacancies = db.get_stale_vacancies(connection, DOMAIN)
+        if len(stale_vacancies) == 0:
+            continue
+        
         print(f"[{dt.datetime.now().isoformat()}] Fetching info about {len(stale_vacancies)} vacancies...")
         fetched: list[Vacancy] = []
         to_delete: list[int] = []
@@ -237,4 +241,3 @@ if __name__ == "__main__":
         # Performing update
         db.update_vacancies(connection, fetched)
         db.delete_vacancies(connection, to_delete)
-        time.sleep(REQUEST_DELAY) # delay between requests
