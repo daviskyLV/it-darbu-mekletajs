@@ -2,9 +2,9 @@ import psycopg2 as pg
 import psycopg2.extensions as pgext
 from psycopg2.extras import Json
 from dataclasses import asdict
-import os
-from util_classes import Vacancy
-import pandas as pd
+import os, ast
+from utils.util_classes import Vacancy
+import datetime as dt
 
 def get_connection() -> pgext.connection:
     """
@@ -39,10 +39,12 @@ def check_if_website_stale(conn: pgext.connection, website: str,
     Checks whether the website vacancy list is stale and should be refetched.
     Optionally, autocloses the database connection.
     """
-    stale: bool = False
     cur: pgext.cursor = conn.cursor()
-    cur.execute("SELECT work_scraper.website_is_stale(%s);", (website,))
-    stale = bool(cur.fetchone())
+    cur.execute("SELECT work_scraper.website_is_stale(%s::TEXT);", (website,))
+    results = cur.fetchall()
+    stale: bool = False
+    for r in results:
+        stale = bool(r[0])
     cur.close()
 
     if autoclose:
@@ -63,27 +65,43 @@ def set_website_scan_status(conn: pgext.connection, website: str,
     if autoclose:
         close_connection(conn)
 
-def convert_vacancies_to_pd(vacancies: list[Vacancy]) -> pd.DataFrame:
+def convert_vacancies_to_columns(vacancies: list[Vacancy]) -> tuple[
+    list[int | None], list[str | None], list[str | None], list[float | None],
+    list[float | None], list[bool | None], list[bool | None],
+    list[dt.datetime | None], list[dt.datetime | None], list[str | None],
+    list[str | None], list[bool], list[str], list[str | None], list[Json | None]
+]:
     """
-    Converts Vacancies list to a pandas DataFrame
+    Converts Vacancies list to a columns in following format:\n
+    db_id, title, employer, salary_min, salary_max, hourly_rate, remote,
+    published, expires, country_code, city_name, fully_fetched, web_id,
+    description, summarized_description
     """
-    return pd.DataFrame([{
-        "db_id": v.db_id,
-        "title": v.title,
-        "employer": v.employer,
-        "salary_min": v.salary_min,
-        "salary_max": v.salary_max,
-        "hourly_rate": v.hourly_rate,
-        "remote": v.remote,
-        "published": v.published,
-        "expires": v.expires,
-        "country_code": v.country_code,
-        "city_name": v.city_name,
-        "fully_fetched": v.fully_fetched,
-        "web_id": v.web_id,
-        "description": v.description,
-        "summary": Json(asdict(v.summarized_description)) if v.summarized_description else None
-    } for v in vacancies])
+    final: tuple[
+        list[int | None], list[str | None], list[str | None], list[float | None],
+        list[float | None], list[bool | None], list[bool | None],
+        list[dt.datetime | None], list[dt.datetime | None], list[str | None],
+        list[str | None], list[bool], list[str], list[str | None], list[Json | None]
+    ] = ([], [], [], [], [], [], [], [], [], [], [], [], [], [], [])
+
+    for v in vacancies:
+        final[0].append(v.db_id)
+        final[1].append(v.title)
+        final[2].append(v.employer)
+        final[3].append(v.salary_min)
+        final[4].append(v.salary_max)
+        final[5].append(v.hourly_rate)
+        final[6].append(v.remote)
+        final[7].append(v.published)
+        final[8].append(v.expires)
+        final[9].append(v.country_code)
+        final[10].append(v.city_name)
+        final[11].append(v.fully_fetched)
+        final[12].append(v.web_id)
+        final[13].append(v.description)
+        final[14].append(Json(asdict(v.summarized_description)) if v.summarized_description else None)
+
+    return final
 
 def add_new_vacancies(conn: pgext.connection, website: str,
                       vacancies: list[Vacancy], autoclose: bool = False):
@@ -91,26 +109,39 @@ def add_new_vacancies(conn: pgext.connection, website: str,
     Adds up to 1000 new vacancies to the saved vacancy list.
     Optionally, autocloses the database connection.
     """
-    df = convert_vacancies_to_pd(vacancies)
+    if len(vacancies) == 0:
+        if autoclose:
+            close_connection(conn)
+        return
+
+    cols = convert_vacancies_to_columns(vacancies)
     cur: pgext.cursor = conn.cursor()
     cur.execute(
-        "CALL work_scraper.add_vacancies(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);",
-        (df["title"].tolist(),
-         df["employer"].tolist(),
-         df["salary_min"].tolist(),
-         df["salary_max"].tolist(),
-         df["hourly_rate"].tolist(),
-         df["remote"].tolist(),
-         df["published"].tolist(),
-         df["expires"].tolist(),
-         df["country_code"].tolist(),
-         df["city_name"].tolist(),
-         df["fully_fetched"].tolist(),
-         df["web_id"].tolist(),
-         website,
-         df["description"].tolist(),
-         df["summarized"].tolist(),
-         ))
+        """CALL work_scraper.add_vacancies(
+        %s::TEXT[], %s::TEXT[],
+        %s::DOUBLE PRECISION[], %s::DOUBLE PRECISION[],
+        %s::BOOLEAN[], %s::BOOLEAN[],
+        %s::TIMESTAMP[], %s::TIMESTAMP[],
+        %s::VARCHAR[], %s::TEXT[],
+        %s::BOOLEAN[], %s::TEXT[],
+        %s::TEXT, %s::TEXT[], %s::JSONB[]);""",
+        (
+            cols[1], # title
+            cols[2], # employer
+            cols[3], # salary_min
+            cols[4], # salary_max
+            cols[5], # hourly_rate
+            cols[6], # remote
+            cols[7], # published
+            cols[8], # expires
+            cols[9], # country_code
+            cols[10], # city_name
+            cols[11], # fully_fetched
+            cols[12], # web_id
+            website,
+            cols[13], # description
+            cols[14], # summarized_description
+        ))
     conn.commit()
     cur.close()
 
@@ -123,24 +154,37 @@ def update_vacancies(conn: pgext.connection, vacancies: list[Vacancy],
     Updates already existing vacancies in the database.
     Optionally, autocloses the database connection.
     """
-    df = convert_vacancies_to_pd(vacancies)
+    if len(vacancies) == 0:
+        if autoclose:
+            close_connection(conn)
+        return
+    
+    cols = convert_vacancies_to_columns(vacancies)
     cur: pgext.cursor = conn.cursor()
     cur.execute(
-        "CALL work_scraper.update_vacancies(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);",
-        (df["db_id"].tolist(),
-         df["title"].tolist(),
-         df["employer"].tolist(),
-         df["salary_min"].tolist(),
-         df["salary_max"].tolist(),
-         df["hourly_rate"].tolist(),
-         df["remote"].tolist(),
-         df["published"].tolist(),
-         df["expires"].tolist(),
-         df["country_code"].tolist(),
-         df["city_name"].tolist(),
-         df["fully_fetched"].tolist(),
-         df["description"].tolist(),
-         df["summarized"].tolist(),
+        """CALL work_scraper.update_vacancies(
+        %s::INTEGER[], %s::TEXT[],
+        %s::TEXT[], %s::DOUBLE PRECISION[],
+        %s::DOUBLE PRECISION[], %s::BOOLEAN[],
+        %s::BOOLEAN[], %s::TIMESTAMP[],
+        %s::TIMESTAMP[], %s::VARCHAR[],
+        %s::TEXT[], %s::BOOLEAN[],
+        %s::TEXT[], %s::JSONB[]);""",
+        (
+            cols[0], # db_id
+            cols[1], # title
+            cols[2], # employer
+            cols[3], # salary_min
+            cols[4], # salary_max
+            cols[5], # hourly_rate
+            cols[6], # remote
+            cols[7], # published
+            cols[8], # expires
+            cols[9], # country_code
+            cols[10], # city_name
+            cols[11], # fully_fetched
+            cols[13], # description
+            cols[14], # summarized_description
         ))
     conn.commit()
     cur.close()
@@ -158,7 +202,7 @@ def get_stale_vacancies(conn: pgext.connection, website: str,
     """
     cur: pgext.cursor = conn.cursor()
     cur.execute(
-        "SELECT work_scraper.get_stale_vacancies(%s);",
+        "SELECT work_scraper.get_stale_vacancies(%s::TEXT);",
         (website,)
     )
     conn.commit()
@@ -166,7 +210,8 @@ def get_stale_vacancies(conn: pgext.connection, website: str,
     
     final: list[tuple[str, int]] = []
     for r in results:
-        final.append((str(r[0]), int(r[1])))
+        t = ast.literal_eval(str(r[0]))
+        final.append((str(t[0]), int(t[1])))
     cur.close()
 
     if autoclose:
@@ -179,8 +224,13 @@ def delete_vacancies(conn: pgext.connection, db_ids: list[int], autoclose: bool 
     Deletes specified vacancies from the database.
     Optionally, autocloses the database connection.
     """
+    if len(db_ids) == 0:
+        if autoclose:
+            close_connection(conn)
+        return
+
     cur = conn.cursor()
-    cur.execute("CALL work_scraper.delete_vacancies(%s);", (db_ids,))
+    cur.execute("CALL work_scraper.delete_vacancies(%s::INTEGER[]);", (db_ids,))
     conn.commit()
     cur.close()
 

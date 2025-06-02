@@ -1,4 +1,4 @@
-from util_classes import SummarizedDescription
+from utils.util_classes import SummarizedDescription
 
 def create_summarized_description(to_summarize: str, keywords_json: dict[str, dict[str, list[str]]]) -> SummarizedDescription:
     """
@@ -21,11 +21,11 @@ def keyword_summarizer(to_summarize: str, keywords: dict[str, list[str]]) -> lis
     and the text to search in for keywords.\n
     Returns: a list of matched keywords (keys)
     """
-    lower = to_summarize.lower()
+    lower = to_summarize.lower().replace("\n", " ").replace("\r", " ")
     matched: list[str] = []
-    for k, v in keywords:
-        for srch in v:
-            if lower.find(srch):
+    for k in keywords:
+        for srch in keywords[k]:
+            if lower.find(f" {srch}") >= 0:
                 matched.append(k)
                 break
     
@@ -37,6 +37,9 @@ def vacancy_valid(summarized: SummarizedDescription | None) -> bool:
     """
     if not summarized:
         return False
+    if len(summarized.general_keywords) == 0:
+        # Vacancy must have at least a general keyword to be valid
+        return False
 
     if len(summarized.business_software) > 0:
         return True
@@ -45,8 +48,6 @@ def vacancy_valid(summarized: SummarizedDescription | None) -> bool:
     if len(summarized.programming_languages) > 0:
         return True
     if len(summarized.technologies) > 0:
-        return True
-    if len(summarized.general_keywords) > 0:
         return True
 
     return False
