@@ -1,6 +1,6 @@
 import requests
 from dotenv import load_dotenv
-from utils.util_classes import Vacancy, SummarizedDescription
+from utils.util_classes import Vacancy
 import utils.db_connection as db
 import utils.summarizer as summary
 import datetime as dt
