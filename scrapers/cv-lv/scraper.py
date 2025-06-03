@@ -5,6 +5,7 @@ import utils.db_connection as db
 import utils.summarizer as summary
 import datetime as dt
 import time, os, json
+import utils.parser as parser
 
 DOMAIN: str = "cv.lv"
 REQUEST_DELAY: float = 1
@@ -117,7 +118,19 @@ def get_vacancy_data(nextjs_url: str, web_id: str, db_id: int,
                     base_desc += f" {d["content"]} "
     else:
         # vacancy is described using an image
-        pass
+        file_req = requests.get(f"https://cv.lv/api/v1/files-service/{vac_json["details"]["fileDetails"]["fileId"]}")
+        if not file_req.ok:
+            print(f"Couldn't get file description for {web_id} for filename {vac_json["details"]["fileDetails"]["fileId"]}")
+        else:
+            fetched_type = file_req.headers["content-type"]
+            img_type: str = fetched_type[fetched_type.find("/")+1:]
+            filename: str = f"image_description.{img_type}"
+            with open(filename, "wb") as img_file:
+                img_file.write(file_req.content)
+
+            parsed = parser.parse_image_file_to_string(filename)
+            base_desc += f" {parsed} "
+            
     summed_description += f" {base_desc} "
 
     summarized = summary.create_summarized_description(summed_description, keywords_json)
@@ -208,6 +221,10 @@ if __name__ == "__main__":
             print(f"[{dt.datetime.now().isoformat()}] Website rescanned!")
         
         # getting stale vacancies to update their info
+        stale_vacancies = db.get_stale_vacancies(connection, DOMAIN)
+        if len(stale_vacancies) == 0:
+            continue
+
         nextjs_url: str = ""
         try:
             nextjs_url = get_nextjs_url()
@@ -216,11 +233,7 @@ if __name__ == "__main__":
             continue
 
         # Fetching full info for stale vacancies
-        stale_vacancies = db.get_stale_vacancies(connection, DOMAIN)
-        if len(stale_vacancies) == 0:
-            continue
-        
-        print(f"[{dt.datetime.now().isoformat()}] Fetching info about {len(stale_vacancies)} vacancies...")
+        print(f"[{dt.datetime.now().isoformat()}] Fetching info for {len(stale_vacancies)} vacancies...")
         fetched: list[Vacancy] = []
         to_delete: list[int] = []
         for sv in stale_vacancies:
