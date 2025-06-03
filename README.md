@@ -4,7 +4,8 @@ This is a small web-scraper program that looks through popular job listing websi
 ## Technical requirements
 1. Python 3.11+ (with pip)
 2. PostgreSQL 17+ (might work on earlier versions)
-3. (Optional) Docker for running in a container
+3. (Optional) Docker for running in a container (TODO)
+4. To parse image descriptions, scrapers use [tesseract](https://github.com/tesseract-ocr/tesseract) library, so make sure to install it
 
 ## Installation
 1. Clone the repository via `git clone https://github.com/daviskyLV/it-darbu-mekletajs.git`
