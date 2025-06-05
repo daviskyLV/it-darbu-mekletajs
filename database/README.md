@@ -11,10 +11,6 @@ The scripts shouldn't have access to modify/read table data directly and should 
 6. `work_scraper.delete_vacancies` - this **procedure** should be used when the scraper detects that the vacancy doesn't meet the requirements and should be deleted.
 
 ## Installation
-Make sure to have PostgreSQL 17 or later installed, some older versions might work too.
-1. execute `tables.sql` to add the necessary tables and their indexes to the database. Optionally, manually add their owner and restrictions.
-2. execute `get_website_id.sql` to add the internally used **function**.
-3. execute `add_cities.sql`, `add_countries.sql` and `add_employers.sql` to add the internally used **procedures**, which populate the cities, countries and employers tables.
-4. execute `website_is_stale.sql` and `mark_website_scanning.sql` to add the corresponding **function/procedure**.
-5. execute `add_vacancies.sql`, `get_stale_vacancies.sql` and `update_vacancies.sql` to allow the scripts to work with the `vacancies` table.
-6. execute `delete_vacancies.sql` to allow the scripts to delete invalid vacancies.
+1. Make sure to have **Docker compose** installed
+2. Edit `compose.yaml` to specify database connection variables
+3. Run `compose.yaml` to start up the database and automatically apply all updates

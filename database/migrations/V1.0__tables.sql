@@ -15,7 +15,8 @@ ON work_scraper.sources (website);
 
 -- manually adding sources
 INSERT INTO work_scraper.sources (website)
-VALUES ('cv.lv');
+VALUES ('cv.lv')
+ON CONFLICT DO NOTHING;
 
 -- populated by scrapers
 CREATE TABLE work_scraper.employers

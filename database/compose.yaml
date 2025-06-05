@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: work_scraper_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: work_scraper
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  flyway:
+    image: flyway/flyway:latest-alpine-mongo
+    container_name: work_scraper_flyway
+    depends_on:
+      - db
+    volumes:
+      - ./migrations:/flyway/sql
+    command: -connectRetries=10 migrate
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/work_scraper
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: postgres
+
+volumes:
+  pgdata:
