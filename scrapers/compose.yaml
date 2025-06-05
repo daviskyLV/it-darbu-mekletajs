@@ -1,0 +1,4 @@
+services:
+  scraper-cv-lv:
+    build: ./cv-lv
+    env_file: ./cv-lv/.env
