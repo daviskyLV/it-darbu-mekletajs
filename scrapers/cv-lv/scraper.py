@@ -30,8 +30,11 @@ def get_vacancies_list(keywords_json: dict[str, dict[str, list[str]]]) -> list[V
                 summed_description += f" {keyv} "
         
         summarized = summary.create_summarized_description(summed_description, keywords_json)
-        if not summary.vacancy_valid(summarized):
-            # vacancy didnt have any matching keywords, skipping
+        # if not summary.vacancy_valid(summarized):
+        #     # vacancy didnt have any matching keywords, skipping
+        #     continue
+        if not 10 in v["categories"]:
+            # vacancy doesnt have "INFORMATION_TECHNOLOGY" tag, skipping
             continue
 
         s_min: float = 0
@@ -91,6 +94,7 @@ def get_vacancy_data(nextjs_url: str, web_id: str, db_id: int,
     Gets detailed data about a vacancy, throws an exception if couldn't fetch data.\n
     Returns: Vacancy with nearly all data up to date
     """
+    #mezd8hB2BMdFAOGky93ai
     vacancy_req = requests.get(f"https://cv.lv/_next/data/{nextjs_url}/lv/vacancy/{web_id}/a/a.json?params={web_id}")
     if not vacancy_req.ok:
         raise Exception(f"Couldn't fetch vacancy data for {web_id} using nextjs url {nextjs_url}")
@@ -235,14 +239,14 @@ if __name__ == "__main__":
         # Fetching full info for stale vacancies
         print(f"[{dt.datetime.now().isoformat()}] Fetching info for {len(stale_vacancies)} vacancies...")
         fetched: list[Vacancy] = []
-        to_delete: list[int] = []
+        #to_delete: list[int] = []
         for sv in stale_vacancies:
             try:
                 data = get_vacancy_data(nextjs_url, sv[0], sv[1], keywords_json)
-                if not summary.vacancy_valid(data.summarized_description):
-                    if data.db_id:
-                        to_delete.append(data.db_id)
-                    continue
+                # if not summary.vacancy_valid(data.summarized_description):
+                #     if data.db_id:
+                #         to_delete.append(data.db_id)
+                #     continue
 
                 # All good, can update in database
                 fetched.append(data)
@@ -253,4 +257,4 @@ if __name__ == "__main__":
         print(f"[{dt.datetime.now().isoformat()}] Vacancy info fetched!")
         # Performing update
         db.update_vacancies(connection, fetched)
-        db.delete_vacancies(connection, to_delete)
+        #db.delete_vacancies(connection, to_delete)
