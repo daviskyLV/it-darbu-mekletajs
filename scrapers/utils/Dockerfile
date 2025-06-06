@@ -8,8 +8,8 @@ RUN apk add --no-cache \
     gcc \
     musl-dev \
     tesseract-ocr \
-    tesseract-ocr-eng \
-    tesseract-ocr-lav \
+    tesseract-ocr-data-eng \
+    tesseract-ocr-data-lav \
     jpeg-dev \
     zlib-dev \
     tiff-dev \
@@ -20,12 +20,12 @@ RUN apk add --no-cache \
     harfbuzz-dev \
     fribidi-dev
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
 # Copying utils to app/utils directory
 WORKDIR /app/utils
 COPY . /app/utils
 
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
 # Do nothing since its a base image
-CMD ["python"]
+# CMD ["python"]
