@@ -1,6 +1,6 @@
 -- used to add countries, returns country ids
 CREATE OR REPLACE PROCEDURE work_scraper.add_countries(
-    country_codes VARCHAR(8)[], OUT country_ids INTEGER[]
+    country_codes TEXT[], OUT country_ids INTEGER[]
 )
 LANGUAGE plpgsql
 AS $$

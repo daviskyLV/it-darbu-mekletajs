@@ -8,7 +8,6 @@ import time, os, json
 import utils.parser as parser
 
 DOMAIN: str = "cv.lv"
-REQUEST_DELAY: float = 1
 
 def get_vacancies_list(keywords_json: dict[str, dict[str, list[str]]]) -> list[Vacancy]:
     """
@@ -186,6 +185,8 @@ if __name__ == "__main__":
     # Load environment variables from .env file
     dotenv_abs = os.path.abspath(os.path.join(script_dir, dotenv_rel))
     load_dotenv(dotenv_abs)
+    web_req_interval = float(os.getenv("WEB_REQUEST_INTERVAL", "0.5"))
+    db_req_interval = float(os.getenv("DB_REQUEST_INTERVAL", "5"))
     connection = db.get_connection()
 
     # Reading keywords.json
@@ -195,7 +196,7 @@ if __name__ == "__main__":
 
     # main loop
     while True:
-        time.sleep(REQUEST_DELAY) # delay between requests
+        time.sleep(db_req_interval) # delay between requests
         # updating website vacancy list if its outdated
         website_stale = db.check_if_website_stale(connection, DOMAIN)
         if website_stale:
@@ -253,7 +254,7 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"[{dt.datetime.now().isoformat()}] Failed to get vacancy data for {sv[0]}", e)
             
-            time.sleep(REQUEST_DELAY) # delay between requests
+            time.sleep(web_req_interval) # delay between requests
         print(f"[{dt.datetime.now().isoformat()}] Vacancy info fetched!")
         # Performing update
         db.update_vacancies(connection, fetched)

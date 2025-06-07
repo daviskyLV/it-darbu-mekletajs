@@ -1,5 +1,5 @@
 {
-    "languages": ["lv", "en", "..."],
+    "languages": ["LV", "EN", "..."],
     "frameworks": ["Angular", "Laravel", "..."],
     "year_exp": 2.0,
     "technologies": ["Docker", "AWS", "Kubernetes", "..."],

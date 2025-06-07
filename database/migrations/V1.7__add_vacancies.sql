@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE work_scraper.add_vacancies(
     salary_min DOUBLE PRECISION[], salary_max DOUBLE PRECISION[],
     is_hourly BOOLEAN[], remote BOOLEAN[],
     published TIMESTAMP[], expires TIMESTAMP[],
-    country_code VARCHAR(8)[], city_name TEXT[],
+    country_code TEXT[], city_name TEXT[],
     full_info BOOLEAN[], web_id TEXT[], source TEXT,
     description TEXT[], summarized JSONB[]
 )
