@@ -6,7 +6,6 @@ This is a small web-scraper program that looks through popular job listing websi
 2. Docker compose
 
 ## Installation
-### Base/local installation
 1. Clone the repository via `git clone https://github.com/daviskyLV/it-darbu-mekletajs.git`
 2. Navigate to [it-darbu-mekletajs/settings/](/settings/)
 3. Copy [template.env](/settings/template.env) and rename it to `.env`
