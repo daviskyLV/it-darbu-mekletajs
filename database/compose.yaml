@@ -13,7 +13,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   flyway:
-    image: flyway/flyway:latest-alpine-mongo
+    image: flyway/flyway:latest-alpine
     container_name: work_scraper_flyway
     depends_on:
       - db
