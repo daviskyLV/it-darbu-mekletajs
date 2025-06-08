@@ -109,6 +109,11 @@ def get_vacancy_data(nextjs_url: str, web_id: str, db_id: int,
     for v in vac_json["skills"]:
         summed_description += f" {v["value"]} "
 
+    languages: list[str] = []
+    # adding languages
+    for v in vac_json["languages"]:
+        languages.append(v["iso"])
+
     base_desc: str = ""
     if not vac_json["details"]["fileDetails"]:
         # vacancy described in text
@@ -131,15 +136,17 @@ def get_vacancy_data(nextjs_url: str, web_id: str, db_id: int,
             with open(filename, "wb") as img_file:
                 img_file.write(file_req.content)
 
-            parsed = parser.parse_image_file_to_string(filename)
+            parsed = parser.parse_image_file_to_string(filename, lv_enabled=("lv" in languages), en_enabled=("en" in languages))
             base_desc += f" {parsed} "
             
+    try:
+        base_desc = parser.remove_html_tags(base_desc)
+    except Exception as e:
+        print(f"Failed to remove html tags from base description!", e)
     summed_description += f" {base_desc} "
 
     summarized = summary.create_summarized_description(summed_description, keywords_json)
-    # adding languages
-    for v in vac_json["languages"]:
-        summarized.languages.append(v["iso"])
+    summarized.languages = languages
 
     # Creating final vacancy
     cc: str = str(loc_json["countries"][
@@ -170,7 +177,7 @@ def get_vacancy_data(nextjs_url: str, web_id: str, db_id: int,
         city_name=city,
         fully_fetched=True,
         web_id=web_id,
-        description=base_desc,
+        description=base_desc.strip(),
         summarized_description=summarized
     )
 

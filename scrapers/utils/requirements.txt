@@ -1,3 +1,5 @@
 psycopg2-binary
 pytesseract
 Pillow
+bs4
+lxml
