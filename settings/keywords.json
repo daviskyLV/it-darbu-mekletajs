@@ -5,10 +5,10 @@
         "Python": ["python"],
         "SQL": ["sql"],
         "Java": ["java"],
-        "C#": ["c#", ".net"],
-        "C/C++": ["c++", "c ", "c,", "c."],
+        "C#": ["c#", "net "],
+        "C/C++": ["c++", "c "],
         "PHP": ["php"],
-        "Go": ["golang", "go,", "go "],
+        "Go": ["golang", "go "],
         "Rust": ["rust"],
         "Ruby": ["ruby"],
         "MATLAB": ["matlab"],
@@ -25,15 +25,16 @@
         "Cobol": ["cobol"],
         "Zig": ["zig"],
         "Fortran": ["fortran"],
-        "Groovy": ["groovy"]
+        "Groovy": ["groovy"],
+        "Bash": ["bash"]
     },
     "frameworks": {
         "ReactJS": ["react"],
         "jQuery": ["jquery"],
-        "Next.js": ["next.", "nextjs"],
+        "Next.js": ["next js", "nextjs"],
         "Express": ["express"],
         "Angular": ["angular"],
-        "ASP.NET": ["asp.net"],
+        "ASP.NET": ["asp net"],
         "Vue": ["vue"],
         "Spring Boot": ["spring"],
         "WordPress": ["wordpress"],
@@ -82,6 +83,7 @@
         "Automation": ["automat", "ci/cd", "cicd", "workflow"],
         "Developer": ["software", "izstrādātā", "developer", "programmē"],
         "IT": ["it supp", "it atb"],
+        "IoT": ["iegult", "embedded"],
         "Networks": ["network", "datortīkl"],
         "Testing": ["qa ", "test"]
     }
