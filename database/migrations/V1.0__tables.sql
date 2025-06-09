@@ -7,7 +7,9 @@ CREATE TABLE work_scraper.sources
                     CONSTRAINT sources_pk PRIMARY KEY,
     website         TEXT NOT NULL,
     scanning        BOOLEAN DEFAULT FALSE, -- whether site's job listings (list) are currently being scanned 
-    status_updated  TIMESTAMP DEFAULT timestamp 'epoch' -- last time status was changed
+    status_updated  TIMESTAMP DEFAULT timestamp 'epoch', -- last time status was changed
+    rescan_interval INTERVAL DEFAULT '3 days', -- how often the scanning should happen
+    scanning_time   INTERVAL DEFAULT '2 hours' -- how long can the scraper scan the website for
 );
 
 CREATE UNIQUE INDEX website_index
