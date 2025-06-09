@@ -1,10 +1,12 @@
 from utils.util_classes import SummarizedDescription
+from utils.parser import clean_description
 
 def create_summarized_description(to_summarize: str, keywords_json: dict[str, dict[str, list[str]]]) -> SummarizedDescription:
     """
     Takes in a string of text and finds keywords related to programming languages,
     business software, programming frameworks, technologies and max required experience.
     """
+    to_summarize = clean_description(to_summarize)
     return SummarizedDescription(
         languages=[],
         frameworks=keyword_summarizer(to_summarize, keywords_json["frameworks"]),
@@ -21,11 +23,11 @@ def keyword_summarizer(to_summarize: str, keywords: dict[str, list[str]]) -> lis
     and the text to search in for keywords.\n
     Returns: a list of matched keywords (keys)
     """
-    lower = to_summarize.lower().replace("\n", " ").replace("\r", " ")
+    to_summarize = to_summarize.lower()
     matched: list[str] = []
     for k in keywords:
         for srch in keywords[k]:
-            if lower.find(f" {srch}") >= 0:
+            if to_summarize.find(f" {srch}") >= 0:
                 matched.append(k)
                 break
     

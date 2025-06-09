@@ -5,7 +5,7 @@ import utils.db_connection as db
 import utils.summarizer as summary
 import datetime as dt
 import time, os, json
-import utils.parser as parser
+from utils.parser import parse_image_file_to_string, remove_html_tags
 
 DOMAIN: str = "cv.lv"
 
@@ -136,11 +136,11 @@ def get_vacancy_data(nextjs_url: str, web_id: str, db_id: int,
             with open(filename, "wb") as img_file:
                 img_file.write(file_req.content)
 
-            parsed = parser.parse_image_file_to_string(filename, lv_enabled=("lv" in languages), en_enabled=("en" in languages))
+            parsed = parse_image_file_to_string(filename, lv_enabled=("lv" in languages), en_enabled=("en" in languages))
             base_desc += f" {parsed} "
             
     try:
-        base_desc = parser.remove_html_tags(base_desc)
+        base_desc = remove_html_tags(base_desc)
     except Exception as e:
         print(f"Failed to remove html tags from base description!", e)
     summed_description += f" {base_desc} "

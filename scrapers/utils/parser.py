@@ -1,6 +1,7 @@
 from PIL import Image
 import pytesseract
 from bs4 import BeautifulSoup
+import re
 
 def parse_image_file_to_string(filepath: str, lv_enabled: bool = True, en_enabled: bool = True) -> str:
     """
@@ -15,4 +16,15 @@ def parse_image_file_to_string(filepath: str, lv_enabled: bool = True, en_enable
     return text
 
 def remove_html_tags(text: str) -> str:
+    """
+    Removes html tags from text
+    """
     return BeautifulSoup(text, "lxml").text
+
+def clean_description(description: str) -> str:
+    """
+    Replaces punctuation and whitespaces with a single space
+    """
+    description = re.sub(r'[();:,\[\]{}<>?!.]\'"', ' ', description) # punctuation
+    description = re.sub(r'\s+', ' ', description) # whitespaces
+    return description
