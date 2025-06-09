@@ -1,0 +1,28 @@
+DO $$
+BEGIN
+   IF NOT EXISTS (
+      SELECT FROM pg_catalog.pg_roles WHERE rolname = '{DB_SCRAPER_USER}'
+   ) THEN
+      CREATE ROLE ${DB_SCRAPER_USER} LOGIN PASSWORD '${DB_SCRAPER_PASSWORD}';
+   END IF;
+END$$;
+
+-- Grant execution permissions to scraper functions/procedures
+GRANT EXECUTE ON FUNCTION work_scraper.website_is_stale(text) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON PROCEDURE work_scraper.mark_website_scanning(text, boolean) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON FUNCTION work_scraper.get_countries() TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON FUNCTION work_scraper.get_cities() TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON FUNCTION work_scraper.get_employers() TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON FUNCTION work_scraper.get_stale_vacancies(text) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON PROCEDURE work_scraper.delete_vacancies(integer[]) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON FUNCTION work_scraper.get_vacancies(text, integer, integer, boolean, boolean) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON PROCEDURE work_scraper.add_vacancies(
+   text[], text[], double precision[], double precision[], boolean[],
+   boolean[], timestamp[], timestamp[], text[], text[], boolean[], text[], text,
+   text[], jsonb[]
+) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON PROCEDURE work_scraper.update_vacancies(
+   integer[], text[], text[], double precision[], double precision[],
+   boolean[], boolean[], timestamp[], timestamp[], text[], text[],
+   boolean[], text[], jsonb[]
+) TO ${DB_SCRAPER_USER};
