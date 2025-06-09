@@ -115,16 +115,15 @@ def get_vacancy_data(nextjs_url: str, web_id: str, db_id: int,
         languages.append(v["iso"])
 
     base_desc: str = ""
-    if not vac_json["details"]["fileDetails"]:
-        # vacancy described in text
-        if "nativeTranslation" in vac_json:
-            # A native translation exists, using that one
-            base_desc += f" {vac_json["nativeTranslation"]["content"]} "
-        else:
-            for d in vac_json["details"]["standardDetails"]:
-                if d["content"]:
-                    base_desc += f" {d["content"]} "
+    if "nativeTranslation" in vac_json:
+        # A native translation exists, using that one
+        base_desc += f" {vac_json["nativeTranslation"]["content"]} "
     else:
+        # Appending text descriptions
+        for d in vac_json["details"]["standardDetails"]:
+            if d["content"]:
+                base_desc += f" {d["content"]} "
+    if vac_json["details"]["fileDetails"]:
         # vacancy is described using an image
         file_req = requests.get(f"https://cv.lv/api/v1/files-service/{vac_json["details"]["fileDetails"]["fileId"]}")
         if not file_req.ok:
