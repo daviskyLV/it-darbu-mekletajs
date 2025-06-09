@@ -1,5 +1,6 @@
 from utils.util_classes import SummarizedDescription
 from utils.parser import clean_description
+import re
 
 def create_summarized_description(to_summarize: str, keywords_json: dict[str, dict[str, list[str]]]) -> SummarizedDescription:
     """
@@ -10,7 +11,7 @@ def create_summarized_description(to_summarize: str, keywords_json: dict[str, di
     return SummarizedDescription(
         languages=[],
         frameworks=keyword_summarizer(to_summarize, keywords_json["frameworks"]),
-        year_exp=0,
+        year_exp=experience_summarizer(to_summarize),
         technologies=keyword_summarizer(to_summarize, keywords_json["technologies"]),
         programming_languages=keyword_summarizer(to_summarize, keywords_json["programmingLanguages"]),
         business_software=keyword_summarizer(to_summarize, keywords_json["businessSoftware"]),
@@ -32,6 +33,23 @@ def keyword_summarizer(to_summarize: str, keywords: dict[str, list[str]]) -> lis
                 break
     
     return matched
+
+def experience_summarizer(to_summarize: str) -> float:
+    """
+    Summarizes the max required experience in years from a job description.
+    """
+    to_summarize = to_summarize.lower()
+    # Regex with capture group for the number
+    pattern_en = r'\b(\d+)\+?\s+years?\b' # 2+ year(s)/1 year/...
+    pattern_lv = r'\b(\d+)\+?\s+gad\b' # 2+ gad(u)/3 gad(iem)/...
+    years = [float(match) for match in re.findall(pattern_en, to_summarize)]
+    years += [float(match) for match in re.findall(pattern_lv, to_summarize)]
+    years.sort()
+    
+    if len(years) == 0:
+        return 0
+    else:
+        return years[-1]
 
 def vacancy_valid(summarized: SummarizedDescription | None) -> bool:
     """
