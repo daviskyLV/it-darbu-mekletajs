@@ -4,6 +4,7 @@ This is a small web-scraper program that looks through popular job listing websi
 ## Technical requirements
 1. Docker
 2. Docker compose
+3. Linux
 
 ## Installation
 1. Clone the repository via `git clone https://github.com/daviskyLV/it-darbu-mekletajs.git`
