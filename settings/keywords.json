@@ -80,7 +80,7 @@
         "Full-Stack Dev": ["full-stack", "full stack", "fullstack"],
         "Back-End Dev": ["back-end", "back end", "backend"],
         "Databases": ["datubāz", "database"],
-        "Automation": ["automat", "ci/cd", "cicd", "workflow"],
+        "Automation": ["automat", "ci cd", "cicd", "workflow"],
         "Developer": ["software", "izstrādātā", "developer", "programmē"],
         "IT": ["it supp", "it atb"],
         "IoT": ["iegult", "embedded"],

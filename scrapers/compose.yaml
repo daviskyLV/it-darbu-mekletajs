@@ -9,7 +9,7 @@ services:
     entrypoint: >
       sh -c "
         apk add --no-cache openssh netcat-openbsd &&
-        ssh -i /root/.ssh/scraper_ssh_ed25519 -N -L 5432:localhost:5432 ${DB_SCRAPER_USER}@${DB_HOST}
+        ssh -i /root/.ssh/scraper_ssh_ed25519 -N -L 0.0.0.0:5432:localhost:5432 ${DB_SCRAPER_USER}@${DB_HOST}
       "
     # Making sure the ssh tunnel is set up
     healthcheck:

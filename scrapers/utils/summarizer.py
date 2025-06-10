@@ -1,5 +1,5 @@
 from utils.util_classes import SummarizedDescription
-from utils.parser import clean_description
+from utils.parser import clean_description, remove_html_tags
 import re
 
 def create_summarized_description(to_summarize: str, keywords_json: dict[str, dict[str, list[str]]]) -> SummarizedDescription:
