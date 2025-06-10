@@ -1,5 +1,4 @@
 import requests
-from dotenv import load_dotenv
 from utils.util_classes import Vacancy
 import utils.db_connection as db
 import utils.summarizer as summary
@@ -186,11 +185,8 @@ if __name__ == "__main__":
     # paths
     script_dir = os.path.dirname(__file__) # absolute dir
     keywords_rel = "keywords.json"
-    dotenv_rel = ".env"
 
     # Load environment variables from .env file
-    dotenv_abs = os.path.abspath(os.path.join(script_dir, dotenv_rel))
-    load_dotenv(dotenv_abs)
     web_req_interval = float(os.getenv("WEB_REQUEST_INTERVAL", "0.5"))
     db_req_interval = float(os.getenv("DB_REQUEST_INTERVAL", "5"))
     connection = db.get_connection()

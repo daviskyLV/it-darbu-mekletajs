@@ -19,7 +19,7 @@ def get_connection() -> pgext.connection:
 
     # Connect to the database
     c = pg.connect(
-        host=DB_HOST,
+        host="localhost",#DB_HOST,
         database=DB_NAME,
         user=DB_USER,
         password=DB_PASSWORD,

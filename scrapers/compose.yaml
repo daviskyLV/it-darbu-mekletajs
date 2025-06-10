@@ -1,4 +1,34 @@
 services:
+  # SSH connection to the database
+  ssh-tunnel:
+    image: alpine
+    volumes:
+      - ./scraper_ssh_ed25519:/root/.ssh/scraper_ssh_ed25519:ro
+    networks:
+      - internal
+    entrypoint: >
+      sh -c "
+        apk add --no-cache openssh netcat-openbsd &&
+        ssh -i /root/.ssh/scraper_ssh_ed25519 -N -L 5432:localhost:5432 ${DB_SCRAPER_USER}@${DB_HOST}
+      "
+    # Making sure the ssh tunnel is set up
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5432"]
+      interval: 2s
+      timeout: 1s
+      retries: 10
+      start_period: 5s
+  
+  # cv.lv scraper
   scraper-cv-lv:
+    depends_on:
+      ssh-tunnel:
+        condition: service_healthy
+    networks:
+      - internal
     build: ./cv-lv
-    env_file: ./cv-lv/.env
+    env_file: ./.env
+
+networks:
+  internal:
+    driver: bridge
