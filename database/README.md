@@ -16,6 +16,5 @@ The scripts shouldn't have access to modify/read table data directly and should 
 
 ## Installation
 1. Make sure to have **Docker compose** installed
-2. Rename `template.env` to `.env`
-3. Edit the `.env` file to specify database admin and scraper user credentials, as well as other parameters
-4. Run `compose.yaml` to start up the database and automatically apply all updates
+2. Edit the `.env` file to specify database admin and scraper user credentials, as well as other parameters
+3. Run `docker compose up --build` to start up the database and automatically apply all updates

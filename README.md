@@ -8,13 +8,13 @@ This is a small web-scraper program that looks through popular job listing websi
 ## Installation
 1. Clone the repository via `git clone https://github.com/daviskyLV/it-darbu-mekletajs.git`
 2. Navigate to [it-darbu-mekletajs/settings/](/settings/)
-3. Copy [template.env](/settings/template.env) and rename it to `.env`
-4. Fill out the fields in `.env` so the scrapers can connect to database
+3. Edit the database environment variables in [database.env](settings/database.env), admin user being priviledged user and scrapers user being the one meant for scrapers
+4. Edit the scrapers environment variables in [scrapers.env](settings/scrapers.env), make sure to match scraper user credentials with the database env vars
 5. (Optional) Edit [keywords.json](/settings/keywords.json) with your desired keywords to search for
 6. Run [setup.py](/settings/setup.py) via `python setup.py` to set up all scraper folders
 7. Navigate to [it-darbu-mekletajs/database/](/database/) and follow README.md for database installation
 8. After running the database, navigate to [scrapers directory](/scrapers/)
-9. Either run [compose.yaml](/scrapers/compose.yaml) to run all scrapers on a single machine or build and run each scraper's **Docker image** and run them on separate machines.
+9. Either run `docker compose up --build` to run all scrapers on a single machine or build and run each scraper's **Docker image** and run them on separate machines.
 
 ### Additional notes
 1. If you change [scrapers/utils](/scrapers/utils/) code, remember to adjust the [utils Dockerfile](/scrapers/utils/Dockerfile) and build and upload your own image
