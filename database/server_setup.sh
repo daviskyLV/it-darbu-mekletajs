@@ -4,6 +4,9 @@
 while IFS='=' read -r key value; do
   # Ignore comments and empty lines
   [[ "$key" =~ ^#.*$ || -z "$key" ]] && continue
+
+  # Remove carriage returns
+  value="${value//$'\r'/}"
   
   # Assign the variable locally in the script
   declare "$key=$value"
@@ -17,7 +20,7 @@ if id "$DB_SCRAPER_USER" &>/dev/null; then
 fi
 
 # user doesn't exist
-sudo adduser --gecos "" "$DB_SCRAPER_USER"
+sudo adduser "$DB_SCRAPER_USER"
 # Creating necessary folders
 authkeys="/home/$DB_SCRAPER_USER/.ssh/authorized_keys"
 sudo mkdir -p "/home/$DB_SCRAPER_USER/.ssh"
@@ -27,7 +30,7 @@ sudo touch "$authkeys"
 KEY_COMMENT="scraper-ssh-key"
 KEY_FILENAME="scraper_ssh_ed25519"
 if [ ! -f "./$KEY_FILENAME" ]; then
-  sudo -u "$DB_SCRAPER_USER" ssh-keygen -t ed25519 -f "./$KEY_FILENAME" -N "" -C "$KEY_COMMENT"
+  sudo ssh-keygen -t ed25519 -f "./$KEY_FILENAME" -N "" -C "$KEY_COMMENT"
   pubkey_content=$(< "./$KEY_FILENAME.pub")
   sudo bash -c "echo 'no-agent-forwarding,no-pty,no-user-rc,permitopen=localhost:5432 $pubkey_content' >> '$authkeys'"
 else
@@ -36,7 +39,7 @@ else
 fi
 
 # Setting permissions
-sudo chown -R "$DB_SCRAPER_USER:$DB_SCRAPER_USER /home/$DB_SCRAPER_USER/.ssh"
+sudo chown -R "$DB_SCRAPER_USER:$DB_SCRAPER_USER" "/home/$DB_SCRAPER_USER/.ssh"
 sudo chmod 700 "/home/$DB_SCRAPER_USER/.ssh"
 sudo chmod 600 "$authkeys"
 
