@@ -1,14 +1,27 @@
+secrets:
+  scraper_ssh_key:
+    file: ./scraper_ssh_ed25519
+
+networks:
+  internal:
+    driver: bridge
+
 services:
   # SSH connection to the database
   ssh-tunnel:
     image: alpine
-    volumes:
-      - ./scraper_ssh_ed25519:/root/.ssh/scraper_ssh_ed25519:ro
+    secrets:
+      - scraper_ssh_key
     networks:
       - internal
     entrypoint: >
       sh -c "
         apk add --no-cache openssh netcat-openbsd &&
+        mkdir -p /root/.ssh &&
+        chmod 700 /root/.ssh &&
+        ssh-keyscan ${DB_HOST} >> /root/.ssh/known_hosts &&
+        cp /run/secrets/scraper_ssh_key /root/.ssh/scraper_ssh_ed25519 &&
+        chmod 600 /root/.ssh/scraper_ssh_ed25519 &&
         ssh -i /root/.ssh/scraper_ssh_ed25519 -N -L 0.0.0.0:5432:localhost:5432 ${DB_SCRAPER_USER}@${DB_HOST}
       "
     # Making sure the ssh tunnel is set up
@@ -28,7 +41,3 @@ services:
       - internal
     build: ./cv-lv
     env_file: ./.env
-
-networks:
-  internal:
-    driver: bridge
