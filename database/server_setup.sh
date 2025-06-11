@@ -17,10 +17,10 @@ if id "$DB_SCRAPER_USER" &>/dev/null; then
 fi
 
 # user doesn't exist
-sudo adduser --disabled-password --gecos "" "$DB_SCRAPER_USER"
+sudo adduser --gecos "" "$DB_SCRAPER_USER"
 # Creating necessary folders
 authkeys="/home/$DB_SCRAPER_USER/.ssh/authorized_keys"
-sudo mkdir -p /home/"$DB_SCRAPER_USER"/.ssh
+sudo mkdir -p "/home/$DB_SCRAPER_USER/.ssh"
 sudo touch "$authkeys"
 
 # Generating SSH keys
@@ -36,8 +36,8 @@ else
 fi
 
 # Setting permissions
-sudo chown -R "$DB_SCRAPER_USER":"$DB_SCRAPER_USER" /home/"$DB_SCRAPER_USER"/.ssh
-sudo chmod 700 /home/"$DB_SCRAPER_USER"/.ssh
+sudo chown -R "$DB_SCRAPER_USER:$DB_SCRAPER_USER /home/$DB_SCRAPER_USER/.ssh"
+sudo chmod 700 "/home/$DB_SCRAPER_USER/.ssh"
 sudo chmod 600 "$authkeys"
 
 echo "Created unpriviledged $DB_SCRAPER_USER user with the ability to connect to database and generated ed25519 private/public keys!"
