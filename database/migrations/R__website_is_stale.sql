@@ -17,7 +17,7 @@ BEGIN
             (scanning = FALSE AND curtime >= status_updated + rescan_interval)
             -- being scanned, but for too long (assuming scraper crashed)
             OR (scanning = TRUE AND curtime >= status_updated + scanning_time)
-        )
+        );
 
     IF website_id IS NULL THEN
         stale := FALSE;

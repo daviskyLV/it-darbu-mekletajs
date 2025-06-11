@@ -18,7 +18,7 @@ services:
     volumes:
       - ./migrations:/flyway/sql
       - flyway-status:/flyway-done
-    command: sh -c "-connectRetries=10 migrate && touch /flyway-done/migrations.ok"
+    entrypoint: sh -c "flyway -connectRetries=10 migrate && touch /flyway-done/migrations.ok"
     environment:
       FLYWAY_URL: jdbc:postgresql://db:5432/${DB_NAME}
       FLYWAY_USER: ${DB_ADMIN_USER}
