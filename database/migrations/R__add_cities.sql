@@ -8,7 +8,7 @@ BEGIN
     -- inserting missing cities
     -- filtering out null values
     WITH filter_nulls AS (
-        SELECT c.city_name
+        SELECT DISTINCT c.city_name
         FROM unnest(cities) AS c(city_name)
         WHERE c.city_name IS NOT NULL
     )

@@ -8,7 +8,7 @@ BEGIN
     -- inserting missing countries
     -- filtering out null values
     WITH filter_nulls AS (
-        SELECT c.cc
+        SELECT DISTINCT c.cc
         FROM unnest(country_codes) AS c(cc)
         WHERE c.cc IS NOT NULL
     )
