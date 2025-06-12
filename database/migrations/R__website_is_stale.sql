@@ -2,6 +2,7 @@
 CREATE OR REPLACE FUNCTION work_scraper.website_is_stale(source TEXT)
 RETURNS BOOLEAN
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 DECLARE
     stale BOOLEAN := FALSE;

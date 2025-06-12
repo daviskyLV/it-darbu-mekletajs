@@ -5,6 +5,7 @@ RETURNS TABLE(
     country_code TEXT
 )
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 BEGIN
     RETURN QUERY

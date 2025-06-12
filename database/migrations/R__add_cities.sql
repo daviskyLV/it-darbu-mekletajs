@@ -3,6 +3,7 @@ CREATE OR REPLACE PROCEDURE work_scraper.add_cities(
     cities TEXT[], OUT city_ids INTEGER[]
 )
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 BEGIN
     -- inserting missing cities

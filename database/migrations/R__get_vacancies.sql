@@ -21,6 +21,7 @@ RETURNS TABLE(
     summarized_description JSONB
 )
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 DECLARE
     source_id INTEGER;

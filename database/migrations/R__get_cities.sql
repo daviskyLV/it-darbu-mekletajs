@@ -5,6 +5,7 @@ RETURNS TABLE(
     city_name TEXT
 )
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 BEGIN
     RETURN QUERY

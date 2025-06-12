@@ -3,6 +3,7 @@ CREATE OR REPLACE PROCEDURE work_scraper.add_countries(
     country_codes TEXT[], OUT country_ids INTEGER[]
 )
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 BEGIN
     -- inserting missing countries

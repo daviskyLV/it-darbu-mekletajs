@@ -3,6 +3,7 @@ CREATE OR REPLACE PROCEDURE work_scraper.add_employers(
     employers TEXT[], OUT employer_ids INTEGER[]
 )
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 BEGIN
     -- inserting missing employers

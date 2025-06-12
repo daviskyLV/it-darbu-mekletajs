@@ -8,6 +8,7 @@ CREATE OR REPLACE PROCEDURE work_scraper.update_vacancies(
     full_info BOOLEAN[], description TEXT[], summarized JSONB[]
 )
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 DECLARE
     curtime TIMESTAMP := now();

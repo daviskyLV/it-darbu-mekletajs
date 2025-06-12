@@ -4,6 +4,7 @@ CREATE OR REPLACE FUNCTION work_scraper.get_stale_vacancies(
 )
 RETURNS TABLE(vacancy_web_id TEXT, db_id INTEGER)
 LANGUAGE plpgsql
+SECURITY DEFINER
 AS $$
 DECLARE
     curtime TIMESTAMP := now();
