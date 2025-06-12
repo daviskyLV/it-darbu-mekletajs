@@ -26,6 +26,3 @@ COPY . /app/utils
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Do nothing since its a base image
-# CMD ["python"]

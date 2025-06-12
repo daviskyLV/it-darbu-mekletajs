@@ -1,0 +1,93 @@
+volumes:
+  pgdata:
+  scraper-setup-status:
+
+services:
+  ### DATABASE RELATED SERVICES ###
+  db:
+    image: postgres:17-alpine
+    container_name: work_scraper_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_ADMIN_USER}
+      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  
+  # performing updates
+  flyway-scraper:
+    image: flyway/flyway:latest-alpine
+    container_name: work_scraper_flyway
+    depends_on:
+      - db
+    volumes:
+      - ./database/migrations:/migrations
+      - scraper-setup-status:/flyway-status
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      FLYWAY_USER: ${DB_ADMIN_USER}
+      FLYWAY_PASSWORD: ${DB_ADMIN_PASSWORD}
+      FLYWAY_LOCATIONS: filesystem:/migrations
+    entrypoint: >
+      sh -c "
+        rm -f /flyway-status/scraper-flyway-done &&
+        flyway -connectRetries=10 migrate &&
+        touch /flyway-status/scraper-flyway-done
+      "
+  
+  # setting up scraper user permissions on database
+  db-scraper-perms:
+    image: alpine
+    container_name: db_scraper_perms_setup
+    depends_on:
+      - db
+      - flyway-scraper
+    volumes:
+      - ./database/setup:/setup
+      - scraper-setup-status:/setup-status
+    environment:
+      PGPASSWORD: ${DB_ADMIN_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      DB_SCRAPER_USER: ${DB_SCRAPER_USER}
+      DB_SCRAPER_PASSWORD: ${DB_SCRAPER_PASSWORD}
+    entrypoint: >
+      sh -c "
+        rm -f /setup-status/scraper-perms-done &&
+        apk add --no-cache postgresql-client gettext &&
+        echo 'Waiting for DB to be ready...' &&
+        until pg_isready -h db -U ${DB_ADMIN_USER} -d ${DB_NAME}; do sleep 1; done &&
+        echo 'Waiting for Flyway to complete...' &&
+        while [ ! -f /setup-status/scraper-flyway-done ]; do sleep 1; done &&
+        echo 'Creating low privilege user and giving perms' &&
+        envsubst < /setup/setup_permissions.sql.template > /setup/setup_permissions.sql &&
+        psql -h db -U ${DB_ADMIN_USER} -d ${DB_NAME} -f /setup/setup_permissions.sql &&
+        touch /setup-status/scraper-perms-done
+      "
+  
+  ### SCRAPERS RELATED SERVICES ###
+  # cv.lv scraper
+  scraper-cv-lv:
+    depends_on:
+      - db
+    build: ./scrapers/cv-lv
+    volumes:
+      - scraper-setup-status:/db-setup-status
+      - ./keywords.json:/keywords.json
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME}
+      DB_SCRAPER_USER: ${DB_SCRAPER_USER}
+      DB_SCRAPER_PASSWORD: ${DB_SCRAPER_PASSWORD}
+      DB_PORT: 5432
+      WEB_REQUEST_INTERVAL_MIN: ${WEB_REQUEST_INTERVAL_MIN}
+      WEB_REQUEST_INTERVAL_MAX: ${WEB_REQUEST_INTERVAL_MAX}
+      DB_REQUEST_INTERVAL_MIN: ${DB_REQUEST_INTERVAL_MIN}
+      DB_REQUEST_INTERVAL_MAX: ${DB_REQUEST_INTERVAL_MAX}
+    entrypoint: >
+      sh -c "
+        echo 'Waiting for DB scraper setup to complete...' &&
+        while [ ! -f /db-setup-status/scraper-perms-done ]; do sleep 1; done &&
+        python /app/scraper.py
+      "

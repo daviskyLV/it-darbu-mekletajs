@@ -2,6 +2,7 @@ import requests
 from utils.util_classes import Vacancy
 import utils.db_connection as db
 import utils.summarizer as summary
+from utils.util_funcs import get_random
 import datetime as dt
 import time, os, json
 from utils.parser import parse_image_file_to_string, remove_html_tags
@@ -180,25 +181,26 @@ def get_vacancy_data(nextjs_url: str, web_id: str, db_id: int,
     )
 
 
-
 if __name__ == "__main__":
-    # paths
-    script_dir = os.path.dirname(__file__) # absolute dir
-    keywords_rel = "keywords.json"
-
-    # Load environment variables from .env file
-    web_req_interval = float(os.getenv("WEB_REQUEST_INTERVAL", "0.5"))
-    db_req_interval = float(os.getenv("DB_REQUEST_INTERVAL", "5"))
+    # Load environment variables
+    web_req_interval = (
+        float(os.getenv("WEB_REQUEST_INTERVAL_MIN", "0.5")),
+        float(os.getenv("WEB_REQUEST_INTERVAL_MAX", "1.0"))
+    )
+    db_req_interval = (
+        float(os.getenv("DB_REQUEST_INTERVAL_MIN", "5.0")),
+        float(os.getenv("DB_REQUEST_INTERVAL_MIN", "10.0"))
+    )
     connection = db.get_connection()
 
     # Reading keywords.json
     keywords_json: dict[str, dict[str, list[str]]] = {}
-    with open(os.path.abspath(os.path.join(script_dir, keywords_rel)), "r") as file:
+    with open("/keywords.json", "r") as file:
         keywords_json: dict[str, dict[str, list[str]]] = json.load(file)
 
     # main loop
     while True:
-        time.sleep(db_req_interval) # delay between requests
+        time.sleep(get_random(db_req_interval[0], db_req_interval[1])) # delay between requests
         # updating website vacancy list if its outdated
         website_stale = db.check_if_website_stale(connection, DOMAIN)
         if website_stale:
@@ -256,7 +258,7 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"[{dt.datetime.now().isoformat()}] Failed to get vacancy data for {sv[0]}", e)
             
-            time.sleep(web_req_interval) # delay between requests
+            time.sleep(get_random(web_req_interval[0], web_req_interval[1])) # delay between requests
         print(f"[{dt.datetime.now().isoformat()}] Vacancy info fetched!")
         # Performing update
         db.update_vacancies(connection, fetched)

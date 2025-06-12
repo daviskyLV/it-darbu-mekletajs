@@ -10,19 +10,13 @@ def get_connection() -> pgext.connection:
     """
     Create a connection to the database. Throws an exception if fails.
     """
-    # Database connection details
-    DB_NAME = os.getenv("DB_NAME", "work_scraper")
-    DB_USER = os.getenv("DB_SCRAPER_USER", "postgres")
-    DB_PASSWORD = os.getenv("DB_SCRAPER_PASSWORD", "postgres")
-    DB_PORT = 5432
-
     # Connect to the database
     c = pg.connect(
-        host="ssh-tunnel",
-        database=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        port=DB_PORT
+        host=os.getenv("DB_HOST", "localhost"),
+        database=os.getenv("DB_NAME", "work_scraper"),
+        user=os.getenv("DB_SCRAPER_USER", "postgres"),
+        password=os.getenv("DB_SCRAPER_PASSWORD", "postgres"),
+        port=os.getenv("DB_PORT", 5432)
     )
     return c
 
