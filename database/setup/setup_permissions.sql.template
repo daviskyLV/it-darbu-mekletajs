@@ -1,7 +1,7 @@
 DO $$
 BEGIN
    IF NOT EXISTS (
-      SELECT FROM pg_catalog.pg_roles WHERE rolname = '{DB_SCRAPER_USER}'
+      SELECT FROM pg_catalog.pg_roles WHERE rolname = '${DB_SCRAPER_USER}'
    ) THEN
       CREATE ROLE ${DB_SCRAPER_USER} LOGIN PASSWORD '${DB_SCRAPER_PASSWORD}';
    END IF;
