@@ -8,6 +8,7 @@ BEGIN
 END$$;
 
 -- Grant execution permissions to scraper functions/procedures
+GRANT USAGE ON SCHEMA work_scraper TO ${DB_SCRAPER_USER};
 GRANT EXECUTE ON FUNCTION work_scraper.website_is_stale(text) TO ${DB_SCRAPER_USER};
 GRANT EXECUTE ON PROCEDURE work_scraper.mark_website_scanning(text, boolean) TO ${DB_SCRAPER_USER};
 GRANT EXECUTE ON FUNCTION work_scraper.get_countries() TO ${DB_SCRAPER_USER};
