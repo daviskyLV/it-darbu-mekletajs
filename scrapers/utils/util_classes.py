@@ -1,5 +1,6 @@
 import datetime as dt
 from dataclasses import dataclass
+from psycopg2.extras import Json
 
 @dataclass
 class SummarizedDescription:
@@ -24,7 +25,23 @@ class Vacancy:
     expires: dt.datetime | None
     country_code: str | None
     city_name: str | None
-    fully_fetched: bool
     web_id: str
     description: str | None
     summarized_description: SummarizedDescription | None
+
+@dataclass
+class VacanciesList:
+    db_id: list[int | None] = []
+    title: list[str | None] = []
+    employer: list[str | None] = []
+    salary_min: list[float | None] = []
+    salary_max: list[float | None] = []
+    hourly_rate: list[bool | None] = []
+    remote: list[bool | None] = []
+    published: list[dt.datetime | None] = []
+    expires: list[dt.datetime | None] = []
+    country_code: list[str | None] = []
+    city_name: list[str | None] = []
+    web_id: list[str] = []
+    description: list[str | None] = []
+    summarized_description: list[Json | None] = []
