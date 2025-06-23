@@ -16,14 +16,20 @@ GRANT EXECUTE ON FUNCTION work_scraper.get_cities() TO ${DB_SCRAPER_USER};
 GRANT EXECUTE ON FUNCTION work_scraper.get_employers() TO ${DB_SCRAPER_USER};
 GRANT EXECUTE ON FUNCTION work_scraper.get_stale_vacancies(text) TO ${DB_SCRAPER_USER};
 GRANT EXECUTE ON PROCEDURE work_scraper.delete_vacancies(integer[]) TO ${DB_SCRAPER_USER};
-GRANT EXECUTE ON FUNCTION work_scraper.get_vacancies(text, integer, integer, boolean, boolean) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON FUNCTION work_scraper.get_vacancies(
+   text, boolean, integer[], double precision, double precision,
+   boolean, boolean, interval, integer[], integer[]
+) TO ${DB_SCRAPER_USER};
 GRANT EXECUTE ON PROCEDURE work_scraper.add_vacancies(
    text[], text[], double precision[], double precision[], boolean[],
-   boolean[], timestamp[], timestamp[], text[], text[], boolean[], text[], text,
+   boolean[], timestamp[], timestamp[], text[], text[], text[], text,
    text[], jsonb[]
 ) TO ${DB_SCRAPER_USER};
 GRANT EXECUTE ON PROCEDURE work_scraper.update_vacancies(
    integer[], text[], text[], double precision[], double precision[],
    boolean[], boolean[], timestamp[], timestamp[], text[], text[],
-   boolean[], text[], jsonb[]
+   text[], jsonb[]
 ) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON PROCEDURE work_scraper.add_unscanned_vacancies(text[], text) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON FUNCTION work_scraper.get_unscanned_vacancies(text) TO ${DB_SCRAPER_USER};
+GRANT EXECUTE ON PROCEDURE work_scraper.delete_unscanned_vacancies(integer[]) TO ${DB_SCRAPER_USER};

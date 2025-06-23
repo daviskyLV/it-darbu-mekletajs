@@ -1,18 +1,24 @@
 -- used to update existing vacancies
 CREATE OR REPLACE PROCEDURE work_scraper.update_vacancies(
-    vacancy_id INTEGER[], title TEXT[], employer TEXT[],
-    salary_min DOUBLE PRECISION[], salary_max DOUBLE PRECISION[],
-    is_hourly BOOLEAN[], remote BOOLEAN[],
-    published TIMESTAMP[], expires TIMESTAMP[],
-    country_code TEXT[], city_name TEXT[],
-    full_info BOOLEAN[], description TEXT[], summarized JSONB[]
+    vacancy_id INTEGER[],
+    title TEXT[],
+    employer TEXT[],
+    salary_min DOUBLE PRECISION[],
+    salary_max DOUBLE PRECISION[],
+    is_hourly BOOLEAN[],
+    remote BOOLEAN[],
+    published TIMESTAMP[],
+    expires TIMESTAMP[],
+    country_code TEXT[],
+    city_name TEXT[],
+    description TEXT[],
+    summarized JSONB[]
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
     curtime TIMESTAMP := now();
-    checked_times TIMESTAMP[];
     emp_ids INTEGER[];
     country_ids INTEGER[];
     city_ids INTEGER[];
@@ -20,17 +26,6 @@ BEGIN
     CALL work_scraper.add_employers(employer, emp_ids);
     CALL work_scraper.add_countries(country_code, country_ids);
     CALL work_scraper.add_cities(city_name, city_ids);
-    -- converting full_info to either epoch time (needs rechecking) or now()
-    SELECT ARRAY(
-        SELECT CASE WHEN
-            inp.fi IS NULL OR inp.fi = FALSE THEN timestamp 'epoch'
-            ELSE curtime
-        END
-        FROM unnest(full_info) WITH ORDINALITY AS inp(fi, ord) -- to keep correct order
-        ORDER BY ord
-    )
-    INTO checked_times;
-
 
     -- updating vacancies
     UPDATE work_scraper.vacancies AS l
@@ -45,7 +40,7 @@ BEGIN
         expires = inp.expires,
         country = inp.country,
         city = inp.city,
-        last_checked = inp.checked,
+        last_checked = curtime,
         description = inp.description,
         summarized_description = inp.summarized
     FROM (
@@ -62,7 +57,6 @@ BEGIN
             expires[i] AS expires,
             country_ids[i] AS country,
             city_ids[i] AS city,
-            checked_times[i] AS checked,
             description[i] AS description,
             summarized[i] AS summarized
         FROM generate_subscripts(vacancy_id, 1) AS i -- positional index for alignment

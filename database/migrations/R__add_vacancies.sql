@@ -1,19 +1,25 @@
 -- used to add several brand new vacancies
 CREATE OR REPLACE PROCEDURE work_scraper.add_vacancies(
-    title TEXT[], employer TEXT[],
-    salary_min DOUBLE PRECISION[], salary_max DOUBLE PRECISION[],
-    is_hourly BOOLEAN[], remote BOOLEAN[],
-    published TIMESTAMP[], expires TIMESTAMP[],
-    country_code TEXT[], city_name TEXT[],
-    full_info BOOLEAN[], web_id TEXT[], source TEXT,
-    description TEXT[], summarized JSONB[]
+    title TEXT[],
+    employer TEXT[],
+    salary_min DOUBLE PRECISION[],
+    salary_max DOUBLE PRECISION[],
+    is_hourly BOOLEAN[],
+    remote BOOLEAN[],
+    published TIMESTAMP[],
+    expires TIMESTAMP[],
+    country_code TEXT[],
+    city_name TEXT[],
+    web_id TEXT[],
+    source TEXT,
+    description TEXT[],
+    summarized JSONB[]
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
     curtime TIMESTAMP := now();
-    checked_times TIMESTAMP[];
     emp_ids INTEGER[];
     country_ids INTEGER[];
     city_ids INTEGER[];
@@ -23,17 +29,6 @@ BEGIN
     CALL work_scraper.add_employers(employer, emp_ids);
     CALL work_scraper.add_countries(country_code, country_ids);
     CALL work_scraper.add_cities(city_name, city_ids);
-    -- converting full_info to either epoch time (needs rechecking) or now()
-    SELECT ARRAY(
-        SELECT CASE
-            WHEN inp.fi IS NULL OR inp.fi = FALSE THEN timestamp 'epoch'
-            ELSE curtime
-        END
-        FROM unnest(full_info) WITH ORDINALITY AS inp(fi, ord) -- to keep correct order
-        ORDER BY ord
-    )
-    INTO checked_times;
-
 
     -- inserting vacancies
     INSERT INTO work_scraper.vacancies (
@@ -53,7 +48,7 @@ BEGIN
         expires[i],
         country_ids[i],
         city_ids[i],
-        checked_times[i],
+        curtime,
         web_id[i],
         source_id,
         description[i],
