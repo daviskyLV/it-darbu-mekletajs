@@ -228,6 +228,8 @@ if __name__ == "__main__":
         stale_vacancies = db.get_stale_vacancies(db_con, DOMAIN)
         if len(stale_vacancies) == 0:
             if len(unscanned_vacancies) == 0:
+                db.close_connection(db_con)
+                db_con = None
                 time.sleep(nothing_todo_interval)
             else:
                 time.sleep(get_random(web_req_interval[0], web_req_interval[1]))
