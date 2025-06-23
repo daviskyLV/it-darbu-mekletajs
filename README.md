@@ -13,6 +13,17 @@ This is a small web-scraper program that looks through popular job listing websi
 4. (Optional) Edit [keywords.json](/keywords.json) with your desired keywords to search for
 5. Run `docker compose up --build` to start up the database and run all scrapers on a single machine
 
+### Environment variables
+- **DB_ADMIN_USER** - database administrator username, used when initializing the database for the first time
+- **DB_ADMIN_PASSWORD** - database administrator password
+- **DB_SCRAPER_USER** - scraper scripts' database user username, used so scrapers can perform CRUD operations on the database
+- **DB_SCRAPER_PASSWORD** - scraper scripts' database user password
+- **DB_NAME** - database to use when saving vacancy data
+- **WEB_REQUEST_INTERVAL_MIN** - minimum time in seconds for the scrapers to wait before trying to get information about a vacancy from the website
+- **WEB_REQUEST_INTERVAL_MAX** - maximum time in seconds for the scrapers to wait before trying to get information about a vacancy from the website
+- **DB_REQUEST_INTERVAL** - interval between "expensive" database operations performed by a scraper
+- **NOTHING_TODO_INTERVAL** - scraper's sleep time in case there's nothing to do
+
 ### Additional notes
 1. For more information about the database read [database README.md](/database/README.md)
 2. If you change [scrapers/utils](/scrapers/utils/) code, remember to adjust the [utils Dockerfile](/scrapers/utils/Dockerfile) and build and upload your own image

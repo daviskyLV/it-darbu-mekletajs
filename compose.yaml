@@ -1,6 +1,17 @@
 volumes:
   pgdata:
-  scraper-setup-status:
+
+x-scraper-env: &scraper-env
+  environment:
+    DB_HOST: db
+    DB_NAME: ${DB_NAME}
+    DB_SCRAPER_USER: ${DB_SCRAPER_USER}
+    DB_SCRAPER_PASSWORD: ${DB_SCRAPER_PASSWORD}
+    DB_PORT: 5432
+    WEB_REQUEST_INTERVAL_MIN: ${WEB_REQUEST_INTERVAL_MIN}
+    WEB_REQUEST_INTERVAL_MAX: ${WEB_REQUEST_INTERVAL_MAX}
+    DB_REQUEST_INTERVAL: ${DB_REQUEST_INTERVAL}
+    NOTHING_TODO_INTERVAL: ${NOTHING_TODO_INTERVAL}
 
 services:
   ### DATABASE RELATED SERVICES ###
@@ -14,80 +25,53 @@ services:
       POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_ADMIN_USER}"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
   
-  # performing updates
-  flyway-scraper:
+  # performing updates & setting up scraper user
+  db-scraper-migrations:
     image: flyway/flyway:latest-alpine
-    container_name: work_scraper_flyway
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ./database/migrations:/migrations
-      - scraper-setup-status:/flyway-status
+      - ./database/setup:/setup
     environment:
       FLYWAY_URL: jdbc:postgresql://db:5432/${DB_NAME}
       FLYWAY_USER: ${DB_ADMIN_USER}
       FLYWAY_PASSWORD: ${DB_ADMIN_PASSWORD}
       FLYWAY_LOCATIONS: filesystem:/migrations
-    entrypoint: >
-      sh -c "
-        rm -f /flyway-status/scraper-flyway-done &&
-        flyway -connectRetries=10 migrate &&
-        touch /flyway-status/scraper-flyway-done
-      "
-  
-  # setting up scraper user permissions on database
-  db-scraper-perms:
-    image: alpine
-    container_name: db_scraper_perms_setup
-    depends_on:
-      - db
-      - flyway-scraper
-    volumes:
-      - ./database/setup:/setup
-      - scraper-setup-status:/setup-status
-    environment:
-      PGPASSWORD: ${DB_ADMIN_PASSWORD}
-      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
       DB_SCRAPER_USER: ${DB_SCRAPER_USER}
       DB_SCRAPER_PASSWORD: ${DB_SCRAPER_PASSWORD}
     entrypoint: >
       sh -c "
-        rm -f /setup-status/scraper-perms-done &&
-        apk add --no-cache postgresql-client gettext &&
-        echo 'Waiting for DB to be ready...' &&
-        until pg_isready -h db -U ${DB_ADMIN_USER} -d ${DB_NAME}; do sleep 1; done &&
-        echo 'Waiting for Flyway to complete...' &&
-        while [ ! -f /setup-status/scraper-flyway-done ]; do sleep 1; done &&
+        flyway -connectRetries=10 migrate &&
+        apk add --no-cache gettext postgresql17-client &&
         echo 'Creating low privilege user and giving perms' &&
         envsubst < /setup/setup_permissions.sql.template > /setup/setup_permissions.sql &&
         psql -h db -U ${DB_ADMIN_USER} -d ${DB_NAME} -f /setup/setup_permissions.sql &&
-        touch /setup-status/scraper-perms-done
+        touch /setup-done
       "
+    healthcheck:
+      test: ["CMD", "test -f /setup-done"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+  
   
   ### SCRAPERS RELATED SERVICES ###
   # cv.lv scraper
   scraper-cv-lv:
-    depends_on:
-      - db
     build: ./scrapers/cv-lv
+    <<: *scraper-env
+    depends_on:
+      db-scraper-migrations:
+        condition: service_healthy
     volumes:
-      - scraper-setup-status:/db-setup-status
       - ./keywords.json:/keywords.json
-    environment:
-      DB_HOST: db
-      DB_NAME: ${DB_NAME}
-      DB_SCRAPER_USER: ${DB_SCRAPER_USER}
-      DB_SCRAPER_PASSWORD: ${DB_SCRAPER_PASSWORD}
-      DB_PORT: 5432
-      WEB_REQUEST_INTERVAL_MIN: ${WEB_REQUEST_INTERVAL_MIN}
-      WEB_REQUEST_INTERVAL_MAX: ${WEB_REQUEST_INTERVAL_MAX}
-      DB_REQUEST_INTERVAL_MIN: ${DB_REQUEST_INTERVAL_MIN}
-      DB_REQUEST_INTERVAL_MAX: ${DB_REQUEST_INTERVAL_MAX}
-    entrypoint: >
-      sh -c "
-        echo 'Waiting for DB scraper setup to complete...' &&
-        while [ ! -f /db-setup-status/scraper-perms-done ]; do sleep 1; done &&
-        python /app/scraper.py
-      "
