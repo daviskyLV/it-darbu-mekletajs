@@ -51,7 +51,7 @@ BEGIN
         -- includes expired vacancies
         expiration_filter := timestamp 'epoch';
     ELSE
-        last_check_filter := now();
+        expiration_filter := now();
     END IF;
     
     IF cardinality(employers) = 0 THEN
