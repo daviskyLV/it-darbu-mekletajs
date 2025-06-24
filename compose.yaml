@@ -59,12 +59,6 @@ services:
         psql -h db -U ${DB_ADMIN_USER} -d ${DB_NAME} -f /setup/setup_permissions.sql &&
         touch /setup-done
       "
-    healthcheck:
-      test: ["CMD-SHELL", "[ -f /setup-done ]"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
   
   
   ### SCRAPERS RELATED SERVICES ###
@@ -74,7 +68,7 @@ services:
     <<: *scraper-env
     depends_on:
       db-scraper-migrations:
-        condition: service_healthy
+        condition: service_completed_successfully
     volumes:
       - ./keywords.json:/keywords.json
   
@@ -84,6 +78,6 @@ services:
     <<: *scraper-env
     depends_on:
       db-scraper-migrations:
-        condition: service_healthy
+        condition: service_completed_successfully
     volumes:
       - ./keywords.json:/keywords.json
