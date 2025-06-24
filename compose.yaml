@@ -48,6 +48,8 @@ services:
       FLYWAY_LOCATIONS: filesystem:/migrations
       DB_SCRAPER_USER: ${DB_SCRAPER_USER}
       DB_SCRAPER_PASSWORD: ${DB_SCRAPER_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
+      PGPASSWORD: ${DB_ADMIN_PASSWORD}
     entrypoint: >
       sh -c "
         flyway -connectRetries=10 migrate &&
