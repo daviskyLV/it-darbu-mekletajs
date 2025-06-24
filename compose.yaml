@@ -60,11 +60,11 @@ services:
         touch /setup-done
       "
     healthcheck:
-      test: ["CMD-SHELL", "test -f /setup-done"]
-      interval: 10s
+      test: ["CMD-SHELL", "[ -f /setup-done ]"]
+      interval: 5s
       timeout: 5s
       retries: 5
-      start_period: 20s
+      start_period: 10s
   
   
   ### SCRAPERS RELATED SERVICES ###
