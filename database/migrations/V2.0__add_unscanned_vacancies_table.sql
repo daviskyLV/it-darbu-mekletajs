@@ -8,8 +8,8 @@ CREATE TABLE work_scraper.unscanned_vacancies(
     last_checked    TIMESTAMP DEFAULT timestamp 'epoch'
 );
 
-CREATE INDEX last_checked_index
+CREATE INDEX unscanned_last_checked_index
 ON work_scraper.unscanned_vacancies (last_checked);
 
-CREATE UNIQUE INDEX source_web_id_index
+CREATE UNIQUE INDEX unscanned_source_web_id_index
 ON work_scraper.unscanned_vacancies (web_source, vacancy_web_id);
