@@ -5,7 +5,7 @@ import utils.summarizer as summary
 from utils.util_funcs import get_random
 import datetime as dt
 import time, os, json
-from utils.parser import parse_image_file_to_string, remove_html_tags
+from utils.parser import parse_image_file_to_string, remove_html_tags, clean_description
 
 DOMAIN: str = "cv.lv"
 
@@ -106,7 +106,7 @@ def get_vacancy_data(nextjs_url: str, web_id: str, db_id: int,
         base_desc = remove_html_tags(base_desc)
     except Exception as e:
         print(f"Failed to remove html tags from base description!", e)
-    summed_description += f" {base_desc} "
+    summed_description += f" {clean_description(base_desc)} "
 
     summarized = summary.create_summarized_description(summed_description, keywords_json)
     summarized.languages = languages

@@ -75,3 +75,13 @@ services:
         condition: service_healthy
     volumes:
       - ./keywords.json:/keywords.json
+  
+  # cvvp.nva.gov.lv scraper
+  scraper-cvvp-nva-gov-lv:
+    build: ./scrapers/cvvp-nva-gov-lv
+    <<: *scraper-env
+    depends_on:
+      db-scraper-migrations:
+        condition: service_healthy
+    volumes:
+      - ./keywords.json:/keywords.json

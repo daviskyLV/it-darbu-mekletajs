@@ -68,7 +68,8 @@
         "Deno": ["deno"],
         "NodeJS": ["node"],
         "Tensorflow": ["tensorflow"],
-        "Web API": ["soap", "rest", "api "]
+        "Web API": ["soap", "rest", "api "],
+        "Apple": ["ios ", "macos ", "mac os"]
     },
     "businessSoftware": {
         "Atlassian": ["atlassian", "jira", "confluence"],
