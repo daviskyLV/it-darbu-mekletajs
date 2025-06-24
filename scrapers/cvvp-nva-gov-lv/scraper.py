@@ -9,6 +9,27 @@ from utils.summarizer import create_summarized_description
 
 DOMAIN: str = "cvvp.nva.gov.lv"
 
+def extract_country_and_city(address: str) -> tuple[str | None, str | None]:
+    """
+    Returns a tuple of country and city for the address provided.\n
+    Returns: [country, city]
+    """
+    country = None
+    city = None
+    splitted = address.split(",")
+    if len(splitted) > 0:
+        country = splitted[0].strip() # Country always first
+    if len(splitted) > 2:
+        if "LV-" in splitted[2]:
+            # A sneaky postal code, city is next
+            if len(splitted) > 3:
+                city = splitted[3].strip()
+        else:
+            city = splitted[2].strip()
+    
+    return (country, city)
+
+
 def get_vacancies_list(offset: int = 0) -> list[str]:
     """
     Returns a list of all available vacancies (only their ids)
@@ -59,18 +80,18 @@ def get_vacancy_data(vacancy_id: str, db_id: int, keywords_json: dict[str, dict[
     summarized = create_summarized_description(summed_desc, keywords_json)
     summarized.languages = languages
     
+    country_city = extract_country_and_city(str(jsonified["adrese"]))
     return Vacancy(
         db_id=db_id,
         title=str(jsonified["profesija"]),
         employer=str(jsonified["uznemums"]),
-        salary_min=float(str(jsonified["alga_no_lidz"]).split()[0]),
-        salary_max=float(str(jsonified["alga_no_lidz"]).split()[-1]),
-        hourly_rate=None,
+        salary_min=float(str(jsonified["alga_no_lidz"]).split("-")[0]),
+        salary_max=float(str(jsonified["alga_no_lidz"]).split("-")[-1]),
         remote=(True if jsonified["ir_attalinati_veicams_darbs"] else False),
         published=dt.datetime.fromisoformat(str(jsonified["publicesanas_datums"])),
         expires=dt.datetime.fromisoformat(str(jsonified["aktuala_lidz"])),
-        country_code="LV",
-        city_name=None,
+        country_code=country_city[0],
+        city_name=country_city[1],
         web_id=vacancy_id,
         description=base_desc.strip(),
         summarized_description=summarized

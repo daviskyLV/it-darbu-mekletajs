@@ -1,5 +1,5 @@
 import datetime as dt
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from psycopg2.extras import Json
 
 @dataclass
@@ -14,34 +14,34 @@ class SummarizedDescription:
 
 @dataclass
 class Vacancy:
-    db_id: int | None
-    title: str | None
-    employer: str | None
-    salary_min: float | None
-    salary_max: float | None
-    hourly_rate: bool | None
-    remote: bool | None
-    published: dt.datetime | None
-    expires: dt.datetime | None
-    country_code: str | None
-    city_name: str | None
     web_id: str
-    description: str | None
-    summarized_description: SummarizedDescription | None
+    db_id: int | None = None
+    title: str | None = None
+    employer: str | None = None
+    salary_min: float | None = None
+    salary_max: float | None = None
+    hourly_rate: bool | None = None
+    remote: bool | None = None
+    published: dt.datetime | None = None
+    expires: dt.datetime | None = None
+    country_code: str | None = None
+    city_name: str | None = None
+    description: str | None = None
+    summarized_description: SummarizedDescription | None = None
 
 @dataclass
 class VacanciesList:
-    db_id: list[int | None] = []
-    title: list[str | None] = []
-    employer: list[str | None] = []
-    salary_min: list[float | None] = []
-    salary_max: list[float | None] = []
-    hourly_rate: list[bool | None] = []
-    remote: list[bool | None] = []
-    published: list[dt.datetime | None] = []
-    expires: list[dt.datetime | None] = []
-    country_code: list[str | None] = []
-    city_name: list[str | None] = []
-    web_id: list[str] = []
-    description: list[str | None] = []
-    summarized_description: list[Json | None] = []
+    db_id: list[int | None] = field(default_factory=list)
+    title: list[str | None] = field(default_factory=list)
+    employer: list[str | None] = field(default_factory=list)
+    salary_min: list[float | None] = field(default_factory=list)
+    salary_max: list[float | None] = field(default_factory=list)
+    hourly_rate: list[bool | None] = field(default_factory=list)
+    remote: list[bool | None] = field(default_factory=list)
+    published: list[dt.datetime | None] = field(default_factory=list)
+    expires: list[dt.datetime | None] = field(default_factory=list)
+    country_code: list[str | None] = field(default_factory=list)
+    city_name: list[str | None] = field(default_factory=list)
+    web_id: list[str] = field(default_factory=list)
+    description: list[str | None] = field(default_factory=list)
+    summarized_description: list[Json | None] = field(default_factory=list)
