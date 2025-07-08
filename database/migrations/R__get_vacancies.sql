@@ -100,7 +100,7 @@ BEGIN
         AND v.published >= publishing_filter
         AND (v.employer IS NULL OR v.employer = ANY(employers_filter))
         AND (v.country IS NULL OR v.country = ANY(countries_filter))
-        AND (v.cities IS NULL OR v.cities = ANY(cities_filter))
+        AND (v.city IS NULL OR v.city = ANY(cities_filter))
         AND (v.is_hourly_rate IS NULL OR v.is_hourly_rate = salary_hourly)
         AND (v.remote IS NULL OR v.remote = remote_job)
         AND (
