@@ -56,8 +56,7 @@ services:
         apk add --no-cache gettext postgresql17-client &&
         echo 'Creating low privilege user and giving perms' &&
         envsubst < /setup/setup_permissions.sql.template > /setup/setup_permissions.sql &&
-        psql -h db -U ${DB_ADMIN_USER} -d ${DB_NAME} -f /setup/setup_permissions.sql &&
-        touch /setup-done
+        psql -h db -U ${DB_ADMIN_USER} -d ${DB_NAME} -f /setup/setup_permissions.sql
       "
   
   
